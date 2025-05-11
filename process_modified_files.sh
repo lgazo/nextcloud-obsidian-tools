@@ -17,11 +17,15 @@ touch -d "$SINCE_DATE" "$REF_FILE"
 
 # Find files modified since that date
 cd "$SOURCE_DIR" || exit 1
-find . -type f -newer "$REF_FILE" | while read -r file; do
+find . \
+  \( -path './.obsidian' -o -path './.obsidian/*' -o -path './.trash' -o -path './.trash/*' \) -prune -o \
+  -type f -newer "$REF_FILE" -print | while read -r file; do
+
+#find . -type f -newer "$REF_FILE" | while read -r file; do
   # Create target directory if it doesn't exist
-  LOCAL_FILE="${file#./}"  # Strip leading "./"
+  REMOTE_PATH="${file#./}"  # Strip leading "./"
   RELATIVE=$(dirname "$file")
-  REMOTE_PATH=$RELATIVE
+  LOCAL_FILE=$file
   #mkdir -p "$TARGET_DIR/$RELATIVE"
   # Copy the file
   #cp --preserve=mode,timestamps "$file" "$TARGET_DIR/$file"
