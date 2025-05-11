@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Usage: ./copy_modified_files.sh /path/to/search "YYYY-MM-DD" /path/to/target
+# Usage: ./copy_modified_files.sh /path/to/search "YYYY-MM-DD" (/path/to/target)
 
+base=$(pwd)
 SOURCE_DIR="$1"
 SINCE_DATE="$2"
-TARGET_DIR="$3"
+#TARGET_DIR="$3"
 
-if [[ -z "$SOURCE_DIR" || -z "$SINCE_DATE" || -z "$TARGET_DIR" ]]; then
-  echo "Usage: $0 <source_dir> <since_date: YYYY-MM-DD> <target_dir>"
+#if [[ -z "$SOURCE_DIR" || -z "$SINCE_DATE" || -z "$TARGET_DIR" ]]; then
+if [[ -z "$SOURCE_DIR" || -z "$SINCE_DATE" ]]; then
+	echo "Usage: $0 <source_dir> <since_date: YYYY-MM-DD> (<target_dir>)"
   exit 1
 fi
 
@@ -25,12 +27,13 @@ find . \
   # Create target directory if it doesn't exist
   REMOTE_PATH="${file#./}"  # Strip leading "./"
   RELATIVE=$(dirname "$file")
-  LOCAL_FILE=$file
+  LOCAL_FILE="$SOURCE_DIR/$file"
   #mkdir -p "$TARGET_DIR/$RELATIVE"
   # Copy the file
   #cp --preserve=mode,timestamps "$file" "$TARGET_DIR/$file"
-  #./upload_if_missing.sh $LOCAL_FILE $REMOTE_PATH
-  echo "./upload_if_missing.sh $LOCAL_FILE $REMOTE_PATH"
+  #echo "./upload_if_missing.sh $LOCAL_FILE $REMOTE_PATH"
+  #echo "$base"
+  (cd $base; bash $base/upload_if_missing.sh "$LOCAL_FILE" "$REMOTE_PATH")
   
 done
 

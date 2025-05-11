@@ -9,12 +9,16 @@ set +a
 : "${NEXTCLOUD_USER:?Missing NEXTCLOUD_USER}"
 : "${NEXTCLOUD_PASSWORD:?Missing NEXTCLOUD_PASSWORD}"
 : "${NEXTCLOUD_URL:?Missing NEXTCLOUD_URL}"
-: "${1:${LOCAL_FILE:?Missing LOCAL_FILE}}"
-: "${2:${REMOTE_PATH:?Missing REMOTE_PATH}}"
+: "${1:?Missing LOCAL_FILE}"
+: "${2:?Missing REMOTE_PATH}"
 
-REMOTE_URL="${NEXTCLOUD_URL}/${NEXTCLOUD_USER}/${REMOTE_PATH}"
+LOCAL_FILE=$1
+REMOTE_PATH=$2
 
-echo "🔍 Checking if file exists on server..."
+# my Obsidian notes are based in "Notes" directory
+REMOTE_URL=$(echo "${NEXTCLOUD_URL}/${NEXTCLOUD_USER}/Notes/${REMOTE_PATH}" | sed 's/ /%20/g')
+
+echo "🔍 Checking if file exists on server... $REMOTE_URL"
 
 HTTP_STATUS=$(curl -u "$NEXTCLOUD_USER:$NEXTCLOUD_PASSWORD" \
   -X PROPFIND \
@@ -23,7 +27,8 @@ HTTP_STATUS=$(curl -u "$NEXTCLOUD_USER:$NEXTCLOUD_PASSWORD" \
 
 if [ "$HTTP_STATUS" == "404" ]; then
     echo "⬆️  File not found on server. Uploading..."
-    curl -u "$NEXTCLOUD_USER:$NEXTCLOUD_PASSWORD" -T "$LOCAL_FILE" "$REMOTE_URL"
+    echo "curl -u \"$NEXTCLOUD_USER:PASS_REDACTED\" -T \"$LOCAL_FILE\" \"$REMOTE_URL\""
+    #curl -u "$NEXTCLOUD_USER:$NEXTCLOUD_PASSWORD" -T "$LOCAL_FILE" "$REMOTE_URL"
     if [ $? -eq 0 ]; then
         echo "✅ Upload successful."
     else
