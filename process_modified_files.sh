@@ -19,7 +19,7 @@ touch -d "$SINCE_DATE" "$REF_FILE"
 cd "$SOURCE_DIR" || exit 1
 find . -type f -newer "$REF_FILE" | while read -r file; do
   # Create target directory if it doesn't exist
-  LOCAL_FILE=$file
+  LOCAL_FILE="${file#./}"  # Strip leading "./"
   RELATIVE=$(dirname "$file")
   REMOTE_PATH=$RELATIVE
   #mkdir -p "$TARGET_DIR/$RELATIVE"
